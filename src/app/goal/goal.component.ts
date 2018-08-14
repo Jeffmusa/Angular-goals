@@ -1,16 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Goals } from '../goals';
-import {GoalService} from '../goals/goal.service';
-import {AlertsService} from '../alert-service/alerts.service';
-import { Goal } from '../goal'
+import { GoalService } from '../goals/goal.service';
+import { AlertsService } from '../alert-service/alerts.service';
+import {QuoteRequestService} from '../quote-http/quote-request.service';
+import { Goal } from '../goal';
+import { HttpClient } from '@angular/common/http';
+import { Quote } from '../quote-class/quote'
+
 
 @Component({
   selector: 'app-goal',
   templateUrl: './goal.component.html',
-  providers: [GoalService],
+  providers: [GoalService,QuoteRequestService],
   styleUrls: ['./goal.component.css']
 })
 export class GoalComponent implements OnInit {
+
   goals: Goal[];
   alertService: AlertsService;
 
@@ -40,22 +45,28 @@ export class GoalComponent implements OnInit {
   // }
 
 
-  deleteGoal(isComplete,index){
-        if (isComplete){
+  deleteGoal(isComplete, index) {
+    if (isComplete) {
 
-            let toDelete=confirm(`Are you sure you want to delete ${this.goals[index].name}`)
+      let toDelete = confirm(`Are you sure you want to delete ${this.goals[index].name}`)
 
-            if(toDelete){
-                this.goals.splice(index,1)
-                this.alertService.alertMe("Goal has been deleted")
-            }
+      if (toDelete) {
+        this.goals.splice(index, 1)
+        this.alertService.alertMe("Goal has been deleted")
+      }
 
-        }
     }
-  constructor(goalService:GoalService,alertService:AlertsService) {
-  this.goals = goalService.getGoals();
-  this.alertService = alertService;//make the service available to the class
-   }
-   ngOnInit() {
-   }
-}
+  }
+  quote: Quote;
+  constructor(goalService:GoalService,alertService:AlertsService,private quoteService:QuoteRequestService) {
+    this.goals = goalService.getGoals();
+    this.alertService = alertService;
+     }
+
+
+    ngOnInit() {
+      this.quoteService.quoteRequest();
+      this.quote = this.quoteService.quote
+    }
+
+  }
